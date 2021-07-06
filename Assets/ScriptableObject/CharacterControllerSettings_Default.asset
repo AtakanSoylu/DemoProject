@@ -12,5 +12,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 95b9a4a70ecb4ce4fac18eec75b0e123, type: 3}
   m_Name: CharacterControllerSettings_Default
   m_EditorClassIdentifier: 
-  _straightSpeed: 15
-  _leftRightSpeed: 2.5
+  _straightSpeed: 5
+  _leftRightSpeed: 10

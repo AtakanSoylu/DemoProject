@@ -1,3 +1,4 @@
+using Demo.PlayerInput;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -8,7 +9,7 @@ namespace Demo.Character
     public class CharacterController : MonoBehaviour
     {
         [SerializeField] private CharacterControllerSettings _characterControllerSettings;
-
+        [SerializeField] private InputData _inputData;
         [SerializeField] private Rigidbody _rigidBody;
 
         public Vector3 playerDirection;
@@ -30,6 +31,7 @@ namespace Demo.Character
         void FixedUpdate()
         {
             MoveStraight();
+            CheckInput();
         }
 
 
@@ -39,7 +41,7 @@ namespace Demo.Character
             playerDirection = new Vector3(1, 0, 0);
             playerLeftDirection = new Vector3(0, 0, 1);
             playerRightDirection = new Vector3(0, 0, -1);
-
+            transform.rotation = Quaternion.Euler(0, -90, 0);
 
         }
 
@@ -53,28 +55,63 @@ namespace Demo.Character
 
         public void MoveStraight()
         {
-            _rigidBody.MovePosition(transform.position + playerDirection * _characterControllerSettings.StraightSpeed * Time.deltaTime);
+            transform.position = Vector3.Lerp(transform.position, transform.position + playerDirection, _characterControllerSettings.StraightSpeed * Time.deltaTime);
+            //_rigidBody.MovePosition(transform.position + playerDirection * _characterControllerSettings.StraightSpeed * Time.deltaTime);
         }
 
+        public void CheckInput()
+        {
+            Vector3 firstPressPos = _inputData.StartClickPosition;
+            Vector3 lastPressPos = _inputData.LastClickPosition;
+            Vector3 currentPressPos = _inputData.CurrentClickPosition;
+
+
+            Vector2 currentSwipe = new Vector3(currentPressPos.x - firstPressPos.x, currentPressPos.y - firstPressPos.y, currentPressPos.z - firstPressPos.z);
+
+            //normalize the 2d vector
+            currentSwipe.Normalize();
+            /*
+            //swipe right
+            if (currentSwipe.x < 0 && currentSwipe.y > -0.5f && currentSwipe.y < 0.5f) {
+                MoveRight();
+                //Debug.Log("right swipe");
+                _inputData.StartClickPosition = _inputData.CurrentClickPosition;
+
+            }
+            //swipe left
+            if (currentSwipe.x > 0 && currentSwipe.y > -0.5f && currentSwipe.y < 0.5f) {
+                MoveLeft();
+                //Debug.Log("left swipe");
+                _inputData.StartClickPosition = _inputData.CurrentClickPosition;
+            }*/
+
+            //swipe left
+            if (currentSwipe.x < 0 && currentSwipe.y > -0.4f && currentSwipe.y < 0.4f)
+            {
+                MoveLeft();
+                Debug.Log("Left swipe");
+                _inputData.StartClickPosition = _inputData.CurrentClickPosition;
+
+            }
+            //swipe right
+            if (currentSwipe.x > 0 && currentSwipe.y > -0.4f && currentSwipe.y < 0.4f)
+            {
+                MoveRight();
+                Debug.Log("right swipe");
+                _inputData.StartClickPosition = _inputData.CurrentClickPosition;
+            }
+            
+
+        }
 
         public void MoveLeft()
         {
-            if (positionLocalX > -3)
-            {
-                Debug.Log("k");
-                transform.Translate(playerLeftDirection * _characterControllerSettings.LeftRightSpeed);
-                positionLocalX--;
-            }
+            transform.position = Vector3.Lerp(transform.position, transform.position + playerLeftDirection, _characterControllerSettings.LeftRightSpeed * Time.deltaTime);
         }
 
         public void MoveRight()
         {
-            if (positionLocalX < 3)
-            {
-                Debug.Log("kk");
-                transform.Translate(playerRightDirection * _characterControllerSettings.LeftRightSpeed);
-                positionLocalX++;
-            }
+            transform.position = Vector3.Lerp(transform.position, transform.position + playerRightDirection, _characterControllerSettings.LeftRightSpeed * Time.deltaTime);
         }
     }
 }

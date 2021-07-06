@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Demo.Camera
+namespace Demo
 {
     public class CameraController : MonoBehaviour
     {
