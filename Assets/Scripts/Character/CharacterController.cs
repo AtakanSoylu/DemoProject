@@ -2,7 +2,7 @@ using Demo.PlayerInput;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
+using DG.Tweening;
 
 namespace Demo.Character
 {
@@ -16,12 +16,14 @@ namespace Demo.Character
         public Vector3 playerLeftDirection;
         public Vector3 playerRightDirection;
 
+        public bool moving;
 
 
         public int positionLocalX;
 
         private void Awake()
         {
+            moving = false;
             positionLocalX = 0;
             playerDirection = new Vector3(0, 0, -1);
             playerLeftDirection = new Vector3(1, 0, 0);
@@ -70,26 +72,12 @@ namespace Demo.Character
 
             //normalize the 2d vector
             currentSwipe.Normalize();
-            /*
-            //swipe right
-            if (currentSwipe.x < 0 && currentSwipe.y > -0.5f && currentSwipe.y < 0.5f) {
-                MoveRight();
-                //Debug.Log("right swipe");
-                _inputData.StartClickPosition = _inputData.CurrentClickPosition;
-
-            }
-            //swipe left
-            if (currentSwipe.x > 0 && currentSwipe.y > -0.5f && currentSwipe.y < 0.5f) {
-                MoveLeft();
-                //Debug.Log("left swipe");
-                _inputData.StartClickPosition = _inputData.CurrentClickPosition;
-            }*/
 
             //swipe left
             if (currentSwipe.x < 0 && currentSwipe.y > -0.4f && currentSwipe.y < 0.4f)
             {
                 MoveLeft();
-                Debug.Log("Left swipe");
+                //Debug.Log("Left swipe");
                 _inputData.StartClickPosition = _inputData.CurrentClickPosition;
 
             }
@@ -106,12 +94,46 @@ namespace Demo.Character
 
         public void MoveLeft()
         {
-            transform.position = Vector3.Lerp(transform.position, transform.position + playerLeftDirection, _characterControllerSettings.LeftRightSpeed * Time.deltaTime);
+            //Sonradan yaptim
+            if (!moving && positionLocalX > -2)
+            {
+                Debug.Log("girdi");
+                
+                transform.DOMove(transform.position + (playerLeftDirection * 2) + (playerDirection * 2), 0.50f).OnUpdate(delegate
+                {
+                    moving = true;
+                })
+                .OnComplete(delegate
+                {
+                    positionLocalX--;
+                    moving = false;
+                });
+            }
+
+            //ilk commitledigim
+            //transform.position = Vector3.Lerp(transform.position, transform.position + playerLeftDirection, _characterControllerSettings.LeftRightSpeed * Time.deltaTime);
         }
 
         public void MoveRight()
         {
-            transform.position = Vector3.Lerp(transform.position, transform.position + playerRightDirection, _characterControllerSettings.LeftRightSpeed * Time.deltaTime);
+
+            //Sonradan yaptim
+            if (!moving && positionLocalX < 2)
+            {
+                Debug.Log("sagGirdi");
+                transform.DOMove(transform.position + (playerRightDirection * 2) + (playerDirection * 2), 0.50f).OnUpdate(delegate
+                {
+                    moving = true;
+                })
+                .OnComplete(delegate
+                {
+                    positionLocalX++;
+                    moving = false;
+                });
+            }
+
+            //ilk commitledigim
+            //transform.position = Vector3.Lerp(transform.position, transform.position + playerRightDirection, _characterControllerSettings.LeftRightSpeed * Time.deltaTime);
         }
     }
 }
